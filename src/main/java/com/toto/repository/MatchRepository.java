@@ -21,7 +21,7 @@ public class MatchRepository implements IMatchRepository{
 
     public List<Match> findByTeam(String team){
         return db.getMatches().stream()
-                .filter(m -> m.getHomeTeam() == team || m.getAwayTeam() == team)
+                .filter(m -> m.getHomeTeam().equals(team) || m.getAwayTeam().equals(team))
                 .toList();
     }
 

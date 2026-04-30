@@ -14,6 +14,6 @@ public class MatchesBySportRequest {
     }
 
     public boolean isValid(){
-        return sport != null && !Sport.getAllSports().contains(sport);
+        return sport != null && Sport.getAllSports().contains(sport);
     }
 }

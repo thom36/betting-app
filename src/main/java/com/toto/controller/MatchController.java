@@ -9,6 +9,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.toto.domain.Match;
 import com.toto.domain.Odd;
+import com.toto.domain.Sport;
 import com.toto.dtos.MatchResponse;
 import com.toto.dtos.MatchesBySportRequest;
 import com.toto.dtos.MatchesByTeamRequest;
@@ -48,25 +49,66 @@ public class MatchController implements HttpHandler{
         exchange.sendResponseHeaders(404, -1);
     }
 
-    private void getMatchesBySport(HttpExchange exchange) throws IOException{
-        try{
-            MatchesBySportRequest request = 
-                objectMapper.readValue(
-                    exchange.getRequestBody(),
-                MatchesBySportRequest.class
-                );
-            if(request == null || !request.isValid()){
-                JsonSender.sendJson(exchange, 400, "Missing field or invalid : sport", objectMapper);
+    private void getMatchesBySport(HttpExchange exchange) throws IOException {
+        try {
+            String query = exchange.getRequestURI().getQuery();
+
+            if (query == null || query.isBlank()) {
+                JsonSender.sendJson(exchange, 400, "Missing query param: sport", objectMapper);
+                return;
+            }
+
+            String sportValue = null;
+
+            for (String param : query.split("&")) {
+                String[] keyValue = param.split("=", 2);
+
+                if (keyValue.length == 2 && keyValue[0].equals("sport")) {
+                    sportValue = keyValue[1];
+                    break;
+                }
+            }
+
+            if (sportValue == null || sportValue.isBlank()) {
+                JsonSender.sendJson(exchange, 400, "Missing query param: sport", objectMapper);
+                return;
+            }
+
+            MatchesBySportRequest request = new MatchesBySportRequest();
+
+            try {
+                Sport sport = Sport.valueOf(sportValue.toUpperCase());
+                request.setSport(sport);
+            } catch (IllegalArgumentException e) {
+                JsonSender.sendJson(exchange, 400, "Invalid sport", objectMapper);
+                return;
+            }
+
+            if (!request.isValid()) {
+                JsonSender.sendJson(exchange, 400, "Invalid sport", objectMapper);
+                return;
             }
 
             List<Match> matches = service.getMatchesBySport(request.getSport());
+
             List<MatchResponse> response = new ArrayList<>();
-            for(Match m : matches){
-                List<OddsResponse> oddsResponses = MapOddsResponse.convertTOddsResponse(m.getOdds());
-                response.add(new MatchResponse(m.getHomeTeam(), m.getAwayTeam(), oddsResponses));
+
+            for (Match m : matches) {
+                List<OddsResponse> oddsResponses =
+                        MapOddsResponse.convertTOddsResponse(m.getOdds());
+
+                response.add(
+                        new MatchResponse(
+                                m.getHomeTeam(),
+                                m.getAwayTeam(),
+                                oddsResponses
+                        )
+                );
             }
+
             JsonSender.sendJson(exchange, 200, response, objectMapper);
-        } catch(Exception e){
+
+        } catch (Exception e) {
             e.printStackTrace();
             JsonSender.sendJson(exchange, 500, "Internal server error", objectMapper);
         }
@@ -99,24 +141,53 @@ public class MatchController implements HttpHandler{
     }
 
     private void getMatchesByTeam(HttpExchange exchange) throws IOException{
-        try{
-            MatchesByTeamRequest request = 
-                objectMapper.readValue(
-                    exchange.getRequestBody(), MatchesByTeamRequest.class);
-            
-            if(request == null || !request.isValid()){
-                JsonSender.sendJson(exchange, 400, "Invalid request : team", objectMapper);
+        try {
+            String query = exchange.getRequestURI().getQuery();
+
+            if (query == null || query.isBlank()) {
+                JsonSender.sendJson(exchange, 400, "Missing query param: team", objectMapper);
+                return;
+            }
+
+            String team = null;
+
+            for (String param : query.split("&")) {
+                String[] keyValue = param.split("=", 2);
+
+                if (keyValue.length == 2 && keyValue[0].equals("team")) {
+                    team = keyValue[1];
+                    break;
+                }
+            }
+
+            MatchesByTeamRequest request = new MatchesByTeamRequest();
+            request.setTeam(team);
+
+            if (!request.isValid()) {
+                JsonSender.sendJson(exchange, 400, "Invalid team", objectMapper);
                 return;
             }
 
             List<Match> matches = service.getMatchesByTeam(request.getTeam());
+
             List<MatchResponse> response = new ArrayList<>();
-            for(Match m : matches){
-                List<OddsResponse> oddsResponses = MapOddsResponse.convertTOddsResponse(m.getOdds());
-                response.add(new MatchResponse(m.getHomeTeam(), m.getAwayTeam(), oddsResponses));
+
+            for (Match m : matches) {
+                List<OddsResponse> oddsResponses =
+                        MapOddsResponse.convertTOddsResponse(m.getOdds());
+
+                response.add(
+                        new MatchResponse(
+                                m.getHomeTeam(),
+                                m.getAwayTeam(),
+                                oddsResponses
+                        )
+                );
             }
+
             JsonSender.sendJson(exchange, 200, response, objectMapper);
-        } catch(Exception e){
+
+        } catch (Exception e) {
             e.printStackTrace();
             JsonSender.sendJson(exchange, 500, "Internal server error", objectMapper);
         }
