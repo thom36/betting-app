@@ -45,7 +45,7 @@ public class UserController implements HttpHandler{
                 JsonSender.sendJson(exchange, 404, "User " + id + "not found", objectMapper);
                 return;
             }
-            UserResponse userResponse = new UserResponse(user.getName(), user.getEmail());
+            UserResponse userResponse = new UserResponse(user.getName(), user.getEmail(), user.getSolde());
             JsonSender.sendJson(exchange, 200, userResponse, objectMapper);
 
         }catch(Exception e){
