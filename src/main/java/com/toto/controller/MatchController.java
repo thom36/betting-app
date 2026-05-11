@@ -215,7 +215,7 @@ public class MatchController implements HttpHandler{
 
         }catch(Exception e){
             e.printStackTrace();
-            JsonSender.sendJson(exchange, 500, "Internal server eroor", objectMapper);
+            JsonSender.sendJson(exchange, 500, "Internal server error", objectMapper);
         }
     }
 }
