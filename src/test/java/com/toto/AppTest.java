@@ -1,4 +1,4 @@
-package com.sepho;
+package com.toto;
 
 import junit.framework.Test;
 import junit.framework.TestCase;

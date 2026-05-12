@@ -18,6 +18,8 @@ import com.toto.service.IMatchService;
 import com.toto.utils.JsonSender;
 import com.toto.utils.MapOddsResponse;
 
+// TODO : faire en sorte que ces routes ne soient accessibles que si authentification.
+
 public class MatchController implements HttpHandler{
     private IMatchService service;
     private final ObjectMapper objectMapper = new ObjectMapper();

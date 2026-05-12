@@ -7,6 +7,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.toto.domain.User;
 import com.toto.dtos.UserResponse;
+import com.toto.exceptions.UserNotFoundException;
 import com.toto.service.IUserService;
 import com.toto.utils.JsonSender;
 
@@ -41,14 +42,14 @@ public class UserController implements HttpHandler{
             }
 
             User user = service.getUserById(id);
-            if(user == null){
-                JsonSender.sendJson(exchange, 404, "User " + id + "not found", objectMapper);
-                return;
-            }
+            
             UserResponse userResponse = new UserResponse(user.getName(), user.getEmail(), user.getSolde());
             JsonSender.sendJson(exchange, 200, userResponse, objectMapper);
 
-        }catch(Exception e){
+        }catch (UserNotFoundException e) {
+            JsonSender.sendJson(exchange, 404, e.getMessage(), objectMapper);
+            
+}       catch(Exception e){
             e.printStackTrace();
             JsonSender.sendJson(exchange, 500, "Internal server error", objectMapper);
         }

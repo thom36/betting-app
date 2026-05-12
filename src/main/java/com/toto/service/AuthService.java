@@ -56,7 +56,6 @@ public class AuthService {
         System.out.println(password);
 
         if (user == null) {
-            System.out.println("Salutttttttt");
             throw new RuntimeException("Identifiants invalides");
         }
 

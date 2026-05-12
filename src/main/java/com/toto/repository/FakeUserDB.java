@@ -3,6 +3,8 @@ package com.toto.repository;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.mindrot.jbcrypt.BCrypt;
+
 import com.toto.domain.User;
 
 public class FakeUserDB {
@@ -11,11 +13,40 @@ public class FakeUserDB {
     private static final List<User> users = new ArrayList<>();
 
     static {
-        User user1 = new User(1, "Thomas", "thomas.messina@gmail.com", "totodu38");
-        User user2 = new User(2, "Sarah", "sarah.dupont@gmail.com", "sarah123");
-        User user3 = new User(3, "Lucas", "lucas.martin@gmail.com", "lucasdev");
-        User user4 = new User(4, "Emma", "emma.bernard@gmail.com", "emma_pro");
-        User user5 = new User(5, "Nina", "nina.robert@gmail.com", "nina789");
+        User user1 = new User(
+            1,
+            "Thomas",
+            "thomas.messina@gmail.com",
+            BCrypt.hashpw("totodu38", BCrypt.gensalt())
+        );
+
+        User user2 = new User(
+            2,
+            "Sarah",
+            "sarah.dupont@gmail.com",
+            BCrypt.hashpw("sarah123", BCrypt.gensalt())
+        );
+
+        User user3 = new User(
+            3,
+            "Lucas",
+            "lucas.martin@gmail.com",
+            BCrypt.hashpw("lucasdev", BCrypt.gensalt())
+        );
+
+        User user4 = new User(
+            4,
+            "Emma",
+            "emma.bernard@gmail.com",
+            BCrypt.hashpw("emma_pro", BCrypt.gensalt())
+        );
+
+        User user5 = new User(
+            5,
+            "Nina",
+            "nina.robert@gmail.com",
+            BCrypt.hashpw("nina789", BCrypt.gensalt())
+        );
 
         users.add(user1);
         users.add(user2);
@@ -24,8 +55,7 @@ public class FakeUserDB {
         users.add(user5);
     }
 
-    private FakeUserDB() {
-    }
+    private FakeUserDB() {}
 
     public static FakeUserDB getInstance() {
         if (dbInstance == null) {
